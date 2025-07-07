@@ -1,35 +1,31 @@
 # See https://pre-commit.com for more information
 # See https://pre-commit.com/hooks.html for more hooks
 repos:
--   repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.5.0
-    hooks:
-    -   id: trailing-whitespace
-    -   id: end-of-file-fixer
-    -   id: check-yaml
-    -   id: check-added-large-files
-    -   id: debug-statements
-    -   id: requirements-txt-fixer
+    - repo: https://github.com/pre-commit/pre-commit-hooks
+      rev: v4.5.0
+      hooks:
+        - id: trailing-whitespace
+        - id: end-of-file-fixer
+        - id: check-yaml
+        - id: check-added-large-files
 
--   repo: https://github.com/PyCQA/docformatter
-    rev: v1.7.5
-    hooks:
-    -   id: docformatter
-        args: [--wrap-summaries, "100", --wrap-descriptions, "100", --in-place]
+    - repo: https://github.com/PyCQA/docformatter
+      rev: v1.7.5
+      hooks:
+        - id: docformatter
+          args: [ --wrap-summaries, "100", --wrap-descriptions, "100", --in-place ]
 
--   repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.2.0
-    hooks:
-    -   id: ruff-format
-    -   id: ruff
-        args: [--fix]
-        types_or: [python, pyi, jupyter]
+    - repo: https://github.com/astral-sh/ruff-pre-commit
+      rev: v0.2.0
+      hooks:
+        - id: ruff-format
+        - id: ruff
 
--   repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.7.0
-    hooks:
-    -   id: mypy
-        args: [
+    - repo: https://github.com/pre-commit/mirrors-mypy
+      rev: v1.7.0
+      hooks:
+        - id: mypy
+          args: [
             --ignore-missing-imports,
             --disallow-untyped-calls,
             --disallow-untyped-defs,
@@ -37,9 +33,10 @@ repos:
             --check-untyped-defs,
             --no-implicit-optional,
             --show-error-codes
-        ]
-        additional_dependencies: [
-            'types-pyyaml>=6.0.12.12',
-            'types-setuptools>=57.4.14',
-            'types-python-dateutil>=2.8.19.14'
-        ] 
+          ]
+          additional_dependencies: [
+            'types-pyyaml==6.0.12.12',
+            'types-Deprecated==1.2.9',
+            'types-redis==4.6.0.7',
+            'types-requests==2.31.0.7'
+          ]

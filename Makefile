@@ -1,19 +1,18 @@
 .PHONY: install test lint format clean setup-hooks setup
 
+PROJECT_NAME = permutations
+ENV_NAME = ${PROJECT_NAME}_env
+
+# Automated code formatting.
+fmt:
+# Could not find a way to run loop that works on both Windows and Linux
+	pre-commit run --all-files
+
 install:
-	pip install -e ".[dev]"
+	conda env update --file environment.yml --prune --name ${ENV_NAME}
 
 test:
 	pytest tests/ --cov=permutations
-
-lint:
-	ruff check permutations/
-	mypy permutations/
-
-format:
-	docformatter --in-place --recursive permutations/
-	ruff format permutations/
-	ruff check --fix permutations/
 
 setup-hooks:
 	pre-commit install
@@ -27,5 +26,3 @@ clean:
 	find . -type d -name .mypy_cache -exec rm -rf {} +
 	find . -type d -name .ruff_cache -exec rm -rf {} +
 	find . -type f -name "*.pyc" -delete
-
-setup: install setup-hooks 

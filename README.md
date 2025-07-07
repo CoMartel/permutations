@@ -1,42 +1,47 @@
 # Permutations
 
-A Python package for efficient permutation analysis and optimization.
-
-## Installation
-
-```bash
-pip install -e .
-```
-
-For development installation with additional tools:
-```bash
-pip install -e ".[dev]"
-```
+Permutations is a Python project for generating table rotations with constraints, for example to organize groups of students who should not be seated together repeatedly.
 
 ## Project Structure
 
 ```
-permutations/
-├── permutations/         # Main package
-│   ├── core/            # Core functionality
-│   ├── algorithms/      # Permutation algorithms
-│   ├── optimization/    # Optimization methods
-│   ├── utils/          # Utility functions
-│   └── visualization/  # Visualization tools
-├── tests/              # Test suite
-├── examples/           # Example notebooks and scripts
-├── docs/              # Documentation
-└── scripts/           # Utility scripts
+Permutations/
+├── environment.yml                # Environment dependencies (conda)
+├── Makefile                       # Build and test commands
+├── README.md                      # This file
+├── ruff.toml                      # Ruff linter configuration
+├── setup.py                       # Package installation script
+├── examples/
+│   └── table_rotation_example.py  # Example usage of the table rotation solver
+├── permutations/
+│   ├── __init__.py
+│   └── core/
+│       ├── __init__.py
+│       └── table_rotation.py      # Table rotation solver implementation
+├── tests/
+│   └── test_core.py               # Unit tests
 ```
 
-## Development
+## Usage Example
+
+See the file `examples/table_rotation_example.py` for an example of how to use the table rotation solver.
+
+## Installation
 
 1. Clone the repository
-2. Install development dependencies: `pip install -e ".[dev]"`
-3. Run tests: `pytest tests/`
-4. Format code: `black .`
-5. Run type checks: `mypy permutations/`
+2. Install dependencies:
+   `make install`
 
-## License
+## Tests
 
-MIT License 
+Run the tests with:
+```
+make test
+```
+
+## Linting
+
+Check code quality with Ruff:
+```
+make fmt
+```

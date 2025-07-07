@@ -1,7 +1,7 @@
 lint.select = ["E", "F", "W", "T20", "ARG", "ERA", "PL", "N", "FIX", "I001", "SLF"]
 line-length = 100
 lint.ignore = ["N818", "PLR2004", "PLW2901"]
-exclude = []
+exclude = ["examples/*.py"]
 fix = true
 
 [lint.per-file-ignores]

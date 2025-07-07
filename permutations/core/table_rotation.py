@@ -118,21 +118,3 @@ class TableRotationSolver:
             raise RuntimeError("Could not find valid solution within maximum attempts")
 
         return rotation_list
-
-    def print_rotations(self, rotations: List[List[Tuple[int, ...]]]) -> None:
-        """Print the rotation configurations in a readable format.
-
-        Args:
-            rotations: List of rotation configurations to print
-        """
-        # ruff: noqa: T201
-        for i, rotation in enumerate(rotations, 1):
-            print(f"\nRotation {i}:")
-            for j, table in enumerate(rotation, 1):
-                print(f"  Table {j}: {table}")
-
-
-if __name__ == "__main__":
-    solver = TableRotationSolver(n_students=12, n_tables=3)
-    rotations = solver.solve()
-    solver.print_rotations(rotations)

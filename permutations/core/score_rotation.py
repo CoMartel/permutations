@@ -28,7 +28,7 @@ def score_rotation(
     for it in range(n_iterations):
         available = list(range(n_students))
         tables: List[List[str]] = [[] for _ in range(n_tables)]
-        for seat in range(max(table_lengths)):
+        while available:
             for t, table in enumerate(tables):
                 if len(table) >= table_lengths[t]:
                     continue
@@ -49,8 +49,7 @@ def score_rotation(
                 if best_idx is not None:
                     tables[t].append(students[best_idx])
                     available.remove(best_idx)
-                if not available:
-                    break
+
         # Update scores: each pair at the same table loses 1 point
         for table in tables:
             indices = [students.index(name) for name in table]

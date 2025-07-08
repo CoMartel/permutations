@@ -23,6 +23,12 @@ if submitted_students:
 
 if st.session_state.boys and st.session_state.girls:
     st.success(f"{len(st.session_state.boys)} boys and {len(st.session_state.girls)} girls loaded.")
+    # Bouton pour réinitialiser les entrées utilisateur
+    if st.button("Réinitialiser les entrées"):
+        st.session_state.boys = []
+        st.session_state.girls = []
+        st.session_state.forbidden_pairs = []
+        st.rerun()
     st.header("Step 2: Add Forbidden Pairs (optional)")
     forbidden_pairs: List[Tuple[str, str]] = []
     all_students = st.session_state.boys + st.session_state.girls
@@ -56,8 +62,25 @@ if st.session_state.boys and st.session_state.girls:
             n_iterations=n_iterations,
             forbidden_pairs=st.session_state.forbidden_pairs,
         )
+        st.session_state.rotations = rotations
         st.success(f"Generated {len(rotations)} rotations.")
         for i, tables in enumerate(rotations):
             st.subheader(f"Rotation {i+1}")
             for t, table in enumerate(tables):
                 st.write(f"Table {t+1}: {', '.join(table)}")
+        # Bouton pour télécharger les rotations en CSV
+        import csv
+        import io
+
+        output = io.StringIO()
+        writer = csv.writer(output)
+        writer.writerow(["Rotation", "Table", "Participants"])
+        for i, tables in enumerate(rotations):
+            for t, table in enumerate(tables):
+                writer.writerow([i + 1, t + 1, ", ".join(table)])
+        st.download_button(
+            label="Télécharger les rotations en CSV",
+            data=output.getvalue(),
+            file_name="rotations.csv",
+            mime="text/csv",
+        )

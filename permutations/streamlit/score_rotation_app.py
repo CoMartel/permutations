@@ -70,16 +70,18 @@ if st.session_state.boys and st.session_state.girls:
             for t, table in enumerate(tables):
                 st.write(f"Table {t+1}: {', '.join(table)}")
 
-        # Download as csv
-        output = io.StringIO()
+        # Download as csv (UTF-8 BOM for Excel compatibility)
+        output = io.StringIO(newline="")
         writer = csv.writer(output)
         writer.writerow(["Rotation", "Table", "Participants"])
         for i, tables in enumerate(rotations):
             for t, table in enumerate(tables):
                 writer.writerow([i + 1, t + 1, ", ".join(table)])
+        csv_data = output.getvalue()
+        bom = "\ufeff"
         st.download_button(
             label="Download as CSV",
-            data=output.getvalue(),
+            data=(bom + csv_data).encode("utf-8"),
             file_name="rotations.csv",
             mime="text/csv",
         )

@@ -1,3 +1,5 @@
+import csv
+import io
 from typing import List, Tuple
 
 import streamlit as st
@@ -9,8 +11,8 @@ st.title("Table Rotation Generator")
 st.header("Step 1: Enter Students")
 
 with st.form("students_form"):
-    boys = st.text_area("Boys (one per line)", "Tom\nAlex\nBen\nDavid")
-    girls = st.text_area("Girls (one per line)", "Emma\nLily\nSophia\nOlivia")
+    boys = st.text_area("Boys (one per line)", "")
+    girls = st.text_area("Girls (one per line)", "")
     submitted_students = st.form_submit_button("Validate Students")
 
 if "boys" not in st.session_state:
@@ -23,12 +25,6 @@ if submitted_students:
 
 if st.session_state.boys and st.session_state.girls:
     st.success(f"{len(st.session_state.boys)} boys and {len(st.session_state.girls)} girls loaded.")
-    # Bouton pour réinitialiser les entrées utilisateur
-    if st.button("Réinitialiser les entrées"):
-        st.session_state.boys = []
-        st.session_state.girls = []
-        st.session_state.forbidden_pairs = []
-        st.rerun()
     st.header("Step 2: Add Forbidden Pairs (optional)")
     forbidden_pairs: List[Tuple[str, str]] = []
     all_students = st.session_state.boys + st.session_state.girls
@@ -49,6 +45,11 @@ if st.session_state.boys and st.session_state.girls:
         st.write("Forbidden pairs:")
         for a, b in st.session_state.forbidden_pairs:
             st.write(f"- {a} / {b}")
+    if st.button("Reset"):
+        st.session_state.boys = []
+        st.session_state.girls = []
+        st.session_state.forbidden_pairs = []
+        st.rerun()
     st.header("Step 3: Generate Rotations")
     n_tables = st.number_input(
         "Number of tables", min_value=1, max_value=len(all_students), value=2
@@ -68,10 +69,8 @@ if st.session_state.boys and st.session_state.girls:
             st.subheader(f"Rotation {i+1}")
             for t, table in enumerate(tables):
                 st.write(f"Table {t+1}: {', '.join(table)}")
-        # Bouton pour télécharger les rotations en CSV
-        import csv
-        import io
 
+        # Download as csv
         output = io.StringIO()
         writer = csv.writer(output)
         writer.writerow(["Rotation", "Table", "Participants"])
@@ -79,7 +78,7 @@ if st.session_state.boys and st.session_state.girls:
             for t, table in enumerate(tables):
                 writer.writerow([i + 1, t + 1, ", ".join(table)])
         st.download_button(
-            label="Télécharger les rotations en CSV",
+            label="Download as CSV",
             data=output.getvalue(),
             file_name="rotations.csv",
             mime="text/csv",

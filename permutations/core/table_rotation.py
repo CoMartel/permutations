@@ -35,9 +35,6 @@ class TableRotationSolver:
         self.needed_rotations = needed_rotations
         self.students_per_table = n_students // n_tables
 
-        if (n_students // n_tables) % 2 != 0:
-            raise ValueError("Number of student per tables must be even")
-
     def _check_forbidden_pairs(self, table: Tuple[int, ...]) -> bool:
         """Check if a table arrangement violates forbidden pair constraints."""
         return any(forbidden_pair.issubset(set(table)) for forbidden_pair in self.forbidden_pairs)
@@ -58,16 +55,21 @@ class TableRotationSolver:
         )
 
         # Find best table to add the odd student to
-        table_scores = [
-            sum(
-                len(set(table + missing_student).intersection(prev_table))
-                for prev_table in used_tables
+        best_score = None
+        best_table_idx = None
+        for idx, table in enumerate(tables):
+            candidate_table = table + missing_student
+            # Vérifie les paires interdites
+            if self._check_forbidden_pairs(candidate_table):
+                continue
+            score = sum(
+                len(set(candidate_table).intersection(prev_table)) for prev_table in used_tables
             )
-            for table in tables
-        ]
-
-        best_table_idx = table_scores.index(min(table_scores))
-        tables[best_table_idx] = tables[best_table_idx] + missing_student
+            if best_score is None or score < best_score:
+                best_score = score
+                best_table_idx = idx
+        if best_table_idx is not None:
+            tables[best_table_idx] = tables[best_table_idx] + missing_student
         return tables
 
     def solve(self) -> List[List[Tuple[int, ...]]]:

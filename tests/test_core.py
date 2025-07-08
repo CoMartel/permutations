@@ -44,16 +44,6 @@ class TestTableRotationSolver:
                 abs(even_count - odd_count) <= 1
             ), f"Parity not respected: even={even_count}, odd={odd_count}, students={all_students}"
 
-    @pytest.mark.parametrize("n_students,n_tables", [(12, 4)])
-    def test_table_rotation_invalid_division(self, n_students: int, n_tables: int) -> None:
-        with pytest.raises(ValueError):
-            TableRotationSolver(
-                n_students=n_students,
-                n_tables=n_tables,
-                needed_rotations=self.needed_rotations,
-                max_attempts=self.max_attempts,
-            )
-
     def test_table_rotation_forbidden_pair(self) -> None:
         # Forbid students 0 and 1 from sitting together
         forbidden_pairs = [{0, 1}]
@@ -71,3 +61,22 @@ class TestTableRotationSolver:
                     f"Forbidden pair {{0, 1}} found together at table: "
                     f"{table} in rotation: {rotation}"
                 )
+
+    def test_odd_student_respects_forbidden_pairs(self) -> None:
+        n_students = 7
+        n_tables = 2
+        forbidden_pairs = [{0, 6}]
+        solver = TableRotationSolver(
+            n_students=n_students,
+            n_tables=n_tables,
+            forbidden_pairs=forbidden_pairs,
+            needed_rotations=2,
+            max_attempts=1000,
+        )
+        rotations = solver.solve()
+        for rotation in rotations:
+            for table in rotation:
+                # Vérifie qu'aucune table ne contient la paire interdite
+                assert not (
+                    set(forbidden_pairs[0]).issubset(set(table))
+                ), f"Forbidden pair {forbidden_pairs[0]} found in table {table}"

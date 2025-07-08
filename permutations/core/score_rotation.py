@@ -25,6 +25,7 @@ def score_rotation(
         available = list(range(n_students))
         tables: List[List[str]] = [[] for _ in range(n_tables)]
         while available:
+            last_available = available.copy()
             for t, table in enumerate(tables):
                 if len(table) > min([len(table) for table in tables]):
                     continue
@@ -45,6 +46,10 @@ def score_rotation(
                 if best_idx is not None:
                     tables[t].append(students[best_idx])
                     available.remove(best_idx)
+            # If no student was added, put the last available student at the smallest table
+            if last_available == available:
+                table_length = [len(table) for table in tables]
+                tables[table_length.index(min(table_length))].append(students[available.pop()])
 
         # Update scores: each pair at the same table loses 1 point
         for table in tables:

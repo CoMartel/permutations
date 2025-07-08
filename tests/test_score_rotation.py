@@ -54,3 +54,24 @@ def test_score_rotation_forbidden_pairs() -> None:
                 assert not pair.issubset(
                     table_set
                 ), f"Forbidden pair {set(pair)} found together in table: {table}"
+
+
+def test_score_rotation_breaks() -> None:
+    boys = ["Tom", "Alex", "Ben", "David"]
+    girls = ["Emma"]
+    n_tables = 2
+    n_iterations = 5
+    forbidden_pairs = [(boy, "Emma") for boy in boys]
+    rotations = score_rotation(
+        boys, girls, n_tables=n_tables, n_iterations=n_iterations, forbidden_pairs=forbidden_pairs
+    )
+    students = set(boys + girls)
+    for rotation in rotations:
+        used = set()
+        for table in rotation:
+            for student in table:
+                assert (
+                    student not in used
+                ), f"Student {student} used more than once in the same iteration: {rotation}"
+                used.add(student)
+        assert used == students, f"Not all students are used in iteration: {rotation}"

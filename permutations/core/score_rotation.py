@@ -1,5 +1,4 @@
-import math
-from typing import List, Optional, Tuple
+from typing import Dict, List, Optional, Set, Tuple
 
 import numpy as np
 
@@ -19,7 +18,6 @@ def score_rotation(
     """
     students = boys + girls
     n_students = len(students)
-    table_size = math.ceil(n_students / n_tables)
     # Initialisation de la matrice de scores
     score_matrix = np.zeros((n_students, n_students))
     for i in range(n_students):
@@ -36,44 +34,30 @@ def score_rotation(
     forbidden_dict = forbidden_pairs_to_dict(forbidden_pairs)
     rotations: List[List[List[str]]] = []
     for it in range(n_iterations):
-        available = set(range(n_students))
+        # Order available students by their total score (descending)
+        available = sorted(range(n_students), key=lambda i: np.sum(score_matrix[i]), reverse=True)
         tables: List[List[str]] = [[] for _ in range(n_tables)]
-        for seat in range(table_size):
-            # For each remaining student, place them
-            # in the table where they would have the best score
-            placed_this_seat = set()
-            for student_idx in list(available):
-                best_table_idx = None
-                best_table_score = None
-                # Compute the current minimum table size
-                table_lengths = [len(table) for table in tables]
-                min_len = min(table_lengths)
-                for t, table in enumerate(tables):
-                    # Do not place if the table exceeds the balance constraint
-                    if len(table) >= table_size:
-                        continue
-                    # Prevent filling a table that would have more
-                    # than one student difference with the smallest
-                    if len(table) > min_len:
-                        continue
-                    # skip if adding this student would create a forbidden pair
-                    if forbidden_dict.get(students[student_idx], set()).intersection(table):
-                        continue
-                    if not table:
-                        score = np.sum(score_matrix[student_idx, list(available)])
-                    else:
-                        indices = [students.index(name) for name in table]
-                        score = sum(score_matrix[student_idx, j] for j in indices)
-                    if best_table_score is None or score > best_table_score:
-                        best_table_score = score
-                        best_table_idx = t
-                if best_table_idx is not None and best_table_idx not in placed_this_seat:
-                    tables[best_table_idx].append(students[student_idx])
-                    available.remove(student_idx)
-                    placed_this_seat.add(best_table_idx)
-                if not available:
-                    break
-            # On ne place qu'un étudiant par table à chaque tour de boucle seat
+        for student_idx in available:
+            table_lengths = [len(table) for table in tables]
+            min_len = min(table_lengths)
+            best_table_idx = None
+            best_table_score = None
+            for t, table in enumerate(tables):
+                if len(table) != min_len:
+                    continue
+                if forbidden_dict.get(students[student_idx], set()).intersection(table):
+                    continue
+                if not table:
+                    score = np.sum(score_matrix[student_idx, available])
+                else:
+                    indices = [students.index(name) for name in table]
+                    score = sum(score_matrix[student_idx, j] for j in indices)
+                if best_table_score is None or score > best_table_score:
+                    best_table_score = score
+                    best_table_idx = t
+            if best_table_idx is not None:
+                tables[best_table_idx].append(students[student_idx])
+        # On ne place qu'un étudiant par table à chaque tour de boucle seat
         # Mise à jour des scores : chaque paire à la même table perd 1 point
         for table in tables:
             indices = [students.index(name) for name in table]
@@ -85,9 +69,11 @@ def score_rotation(
     return rotations
 
 
-def forbidden_pairs_to_dict(forbidden_pairs: Optional[List[Tuple[str, str]]]) -> dict:
+def forbidden_pairs_to_dict(
+    forbidden_pairs: Optional[List[Tuple[str, str]]],
+) -> Dict[str, Set[str]]:
     """Convert a list of forbidden pairs (tuples) to a dict for fast lookup."""
-    forbidden_dict = {}
+    forbidden_dict: Dict[str, Set[str]] = {}
     if forbidden_pairs:
         for a, b in forbidden_pairs:
             forbidden_dict.setdefault(a, set()).add(b)

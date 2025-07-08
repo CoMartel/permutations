@@ -48,9 +48,7 @@ def score_rotation(
                 best_score = None
                 best_idx = None
                 for student_idx in available:
-                    # Forbidden pairs check
-                    forbidden_set = forbidden_dict.get(students[student_idx], set())
-                    if forbidden_set and forbidden_set.intersection(table):
+                    if forbidden_dict.get(students[student_idx], set()).intersection(table):
                         continue
                     if not table:
                         score = np.sum(score_matrix[student_idx, list(available)])

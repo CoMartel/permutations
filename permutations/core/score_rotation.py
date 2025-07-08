@@ -21,16 +21,12 @@ def score_rotation(
     forbidden_pairs = forbidden_pairs or []
     forbidden_dict = forbidden_pairs_to_dict(forbidden_pairs)
     rotations: List[List[List[str]]] = []
-    # Precompute the length of each table for balanced distribution
-    base_table_size = n_students // n_tables
-    extra = n_students % n_tables
-    table_lengths = [base_table_size + 1 if i < extra else base_table_size for i in range(n_tables)]
     for it in range(n_iterations):
         available = list(range(n_students))
         tables: List[List[str]] = [[] for _ in range(n_tables)]
         while available:
             for t, table in enumerate(tables):
-                if len(table) >= table_lengths[t]:
+                if len(table) > min([len(table) for table in tables]):
                     continue
                 # Find the best student to add to this table
                 best_score = None
@@ -56,7 +52,7 @@ def score_rotation(
             for i in indices:
                 for j in indices:
                     if i != j:
-                        score_matrix[i, j] -= 1
+                        score_matrix[i, j] -= 2
         rotations.append(tables)
     return rotations
 

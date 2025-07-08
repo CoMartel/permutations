@@ -12,19 +12,23 @@ Permutations/
 ├── ruff.toml                      # Ruff linter configuration
 ├── setup.py                       # Package installation script
 ├── examples/
-│   └── table_rotation_example.py  # Example usage of the table rotation solver
+│   └── score_rotation_example.py  # Example usage of the score rotation solver
 ├── permutations/
 │   ├── __init__.py
 │   └── core/
 │       ├── __init__.py
-│       └── table_rotation.py      # Table rotation solver implementation
+│       └── score_rotation.py      # Table rotation solver (score-based)
 ├── tests/
-│   └── test_core.py               # Unit tests
+│   └── test_score_rotation.py     # Unit tests for score rotation
 ```
+
+## Table Rotation Solver
+
+- `score_rotation.py`: Generates table rotations using a scoring system to maximize gender diversity and minimize repeated pairings.
 
 ## Usage Example
 
-See the file `examples/table_rotation_example.py` for an example of how to use the table rotation solver.
+See the file `examples/score_rotation_example.py` for an example of how to use the score rotation solver.
 
 ## Installation
 

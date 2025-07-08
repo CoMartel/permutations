@@ -12,7 +12,7 @@ def pretty_print_rotations(rotations: List[List[List[str]]]) -> None:
 
 if __name__ == "__main__":
     boys = ["Tom", "Alex", "Ben", "David"]
-    girls = ["Emma"]
+    girls = ["Emma"," Mia", "Sophia", "Olivia"]
     n_tables = 4
     n_iterations = 4
 

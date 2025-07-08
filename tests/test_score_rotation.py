@@ -7,7 +7,7 @@ def test_score_rotation_all_pairs_meet() -> None:
     boys = [f"B{i}" for i in range(2)]
     girls = [f"G{i}" for i in range(2)]
     n_tables = 2
-    n_iterations = 6
+    n_iterations = 3
     rotations = score_rotation(boys, girls, n_tables=n_tables, n_iterations=n_iterations)
     students = boys + girls
     met_pairs = set()

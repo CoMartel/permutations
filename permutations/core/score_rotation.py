@@ -33,32 +33,39 @@ def score_rotation(
     forbidden_pairs = forbidden_pairs or []
     forbidden_dict = forbidden_pairs_to_dict(forbidden_pairs)
     rotations: List[List[List[str]]] = []
+    # Precompute the length of each table for balanced distribution
+    base_table_size = n_students // n_tables
+    extra = n_students % n_tables
+    table_lengths = [base_table_size + 1 if i < extra else base_table_size for i in range(n_tables)]
     for it in range(n_iterations):
-        # Order available students by their total score (descending)
-        available = sorted(range(n_students), key=lambda i: np.sum(score_matrix[i]), reverse=True)
+        available = set(range(n_students))
         tables: List[List[str]] = [[] for _ in range(n_tables)]
-        for student_idx in available:
-            table_lengths = [len(table) for table in tables]
-            min_len = min(table_lengths)
-            best_table_idx = None
-            best_table_score = None
+        for seat in range(max(table_lengths)):
             for t, table in enumerate(tables):
-                if len(table) != min_len:
+                if len(table) >= table_lengths[t]:
                     continue
-                if forbidden_dict.get(students[student_idx], set()).intersection(table):
-                    continue
-                if not table:
-                    score = np.sum(score_matrix[student_idx, available])
-                else:
-                    indices = [students.index(name) for name in table]
-                    score = sum(score_matrix[student_idx, j] for j in indices)
-                if best_table_score is None or score > best_table_score:
-                    best_table_score = score
-                    best_table_idx = t
-            if best_table_idx is not None:
-                tables[best_table_idx].append(students[student_idx])
-        # On ne place qu'un étudiant par table à chaque tour de boucle seat
-        # Mise à jour des scores : chaque paire à la même table perd 1 point
+                # Find the best student to add to this table
+                best_score = None
+                best_idx = None
+                for student_idx in available:
+                    # Forbidden pairs check
+                    forbidden_set = forbidden_dict.get(students[student_idx], set())
+                    if forbidden_set and forbidden_set.intersection(table):
+                        continue
+                    if not table:
+                        score = np.sum(score_matrix[student_idx, list(available)])
+                    else:
+                        indices = [students.index(name) for name in table]
+                        score = sum(score_matrix[student_idx, j] for j in indices)
+                    if best_score is None or score > best_score:
+                        best_score = score
+                        best_idx = student_idx
+                if best_idx is not None:
+                    tables[t].append(students[best_idx])
+                    available.remove(best_idx)
+                if not available:
+                    break
+        # Update scores: each pair at the same table loses 1 point
         for table in tables:
             indices = [students.index(name) for name in table]
             for i in indices:

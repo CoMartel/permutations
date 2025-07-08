@@ -10,26 +10,14 @@ def score_rotation(
     n_iterations: int = 1,
     forbidden_pairs: Optional[List[Tuple[str, str]]] = None,
 ) -> List[List[List[str]]]:
-    """Génère des rotations de tables en maximisant la diversité de genre et en minimisant les
-    répétitions.
+    """Generates table rotations maximizing gender diversity and minimizing repeated pairings.
 
-    Retourne une liste de rotations, chaque rotation étant une liste de tables, chaque table étant
-    une liste de noms d'étudiants.
+    Returns a list of rotations, each rotation is a list of tables, each table is a list of student
+    names.
     """
     students = boys + girls
     n_students = len(students)
-    # Initialisation de la matrice de scores
-    score_matrix = np.zeros((n_students, n_students))
-    for i in range(n_students):
-        for j in range(n_students):
-            if i == j:
-                score_matrix[i, j] = 0
-            elif (students[i] in boys and students[j] in boys) or (
-                students[i] in girls and students[j] in girls
-            ):
-                score_matrix[i, j] = 0.5
-            else:
-                score_matrix[i, j] = 1
+    score_matrix = initialize_score_matrix(students, boys, girls)
     forbidden_pairs = forbidden_pairs or []
     forbidden_dict = forbidden_pairs_to_dict(forbidden_pairs)
     rotations: List[List[List[str]]] = []
@@ -38,7 +26,7 @@ def score_rotation(
     extra = n_students % n_tables
     table_lengths = [base_table_size + 1 if i < extra else base_table_size for i in range(n_tables)]
     for it in range(n_iterations):
-        available = set(range(n_students))
+        available = list(range(n_students))
         tables: List[List[str]] = [[] for _ in range(n_tables)]
         for seat in range(max(table_lengths)):
             for t, table in enumerate(tables):
@@ -51,7 +39,7 @@ def score_rotation(
                     if forbidden_dict.get(students[student_idx], set()).intersection(table):
                         continue
                     if not table:
-                        score = np.sum(score_matrix[student_idx, list(available)])
+                        score = np.sum(score_matrix[student_idx, available])
                     else:
                         indices = [students.index(name) for name in table]
                         score = sum(score_matrix[student_idx, j] for j in indices)
@@ -72,6 +60,23 @@ def score_rotation(
                         score_matrix[i, j] -= 1
         rotations.append(tables)
     return rotations
+
+
+def initialize_score_matrix(students: List[str], boys: List[str], girls: List[str]) -> np.ndarray:
+    """Create and initialize the score matrix for all students."""
+    n_students = len(students)
+    score_matrix = np.zeros((n_students, n_students))
+    for i in range(n_students):
+        for j in range(n_students):
+            if i == j:
+                score_matrix[i, j] = 0
+            elif (students[i] in boys and students[j] in boys) or (
+                students[i] in girls and students[j] in girls
+            ):
+                score_matrix[i, j] = 0.5
+            else:
+                score_matrix[i, j] = 1
+    return score_matrix
 
 
 def forbidden_pairs_to_dict(

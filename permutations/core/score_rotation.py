@@ -35,22 +35,30 @@ def score_rotation(
     for it in range(n_iterations):
         available = set(range(n_students))
         tables: List[List[str]] = [[] for _ in range(n_tables)]
-        # Remplissage des tables
         for seat in range(table_size):
-            for t in range(n_tables):
+            # Pour chaque étudiant restant, on le place dans la table où il aurait le meilleur score
+            placed_this_seat = set()
+            for student_idx in list(available):
+                best_table_idx = None
+                best_table_score = None
+                for t, table in enumerate(tables):
+                    if len(table) >= table_size:
+                        continue
+                    if not table:
+                        score = np.sum(score_matrix[student_idx, list(available)])
+                    else:
+                        indices = [students.index(name) for name in table]
+                        score = sum(score_matrix[student_idx, j] for j in indices)
+                    if best_table_score is None or score > best_table_score:
+                        best_table_score = score
+                        best_table_idx = t
+                if best_table_idx is not None and best_table_idx not in placed_this_seat:
+                    tables[best_table_idx].append(students[student_idx])
+                    available.remove(student_idx)
+                    placed_this_seat.add(best_table_idx)
                 if not available:
                     break
-                current_table = tables[t]
-                if not current_table:
-                    idx = max(available, key=lambda i: np.sum(score_matrix[i, list(available)]))
-                else:
-                    indices = [students.index(name) for name in current_table]
-                    idx = max(
-                        available,
-                        key=lambda i: sum(score_matrix[i, j] for j in indices),
-                    )
-                tables[t].append(students[idx])
-                available.remove(idx)
+            # On ne place qu'un étudiant par table à chaque tour de boucle seat
         # Mise à jour des scores : chaque paire à la même table perd 1 point
         for table in tables:
             indices = [students.index(name) for name in table]

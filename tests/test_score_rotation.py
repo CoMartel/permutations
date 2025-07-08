@@ -35,3 +35,22 @@ def test_score_rotation_unique_students_per_iteration() -> None:
                 ), f"Student {student} used more than once in the same iteration: {rotation}"
                 used.add(student)
         assert used == students, f"Not all students are used in iteration: {rotation}"
+
+
+def test_score_rotation_forbidden_pairs() -> None:
+    boys = ["Tom", "Alex", "Ben", "David"]
+    girls = ["Emma", "Lily", "Sophia", "Olivia"]
+    n_tables = 2
+    n_iterations = 5
+    forbidden_pairs = [("Tom", "Emma"), ("Ben", "Lily")]
+    rotations = score_rotation(
+        boys, girls, n_tables=n_tables, n_iterations=n_iterations, forbidden_pairs=forbidden_pairs
+    )
+    forbidden_set = set(frozenset(pair) for pair in forbidden_pairs)
+    for rotation in rotations:
+        for table in rotation:
+            table_set = set(table)
+            for pair in forbidden_set:
+                assert not pair.issubset(
+                    table_set
+                ), f"Forbidden pair {set(pair)} found together in table: {table}"

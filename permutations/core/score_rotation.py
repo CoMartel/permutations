@@ -1,5 +1,5 @@
 import math
-from typing import List
+from typing import List, Optional, Tuple
 
 import numpy as np
 
@@ -9,6 +9,7 @@ def score_rotation(
     girls: List[str],
     n_tables: int,
     n_iterations: int = 1,
+    forbidden_pairs: Optional[List[Tuple[str, str]]] = None,
 ) -> List[List[List[str]]]:
     """Génère des rotations de tables en maximisant la diversité de genre et en minimisant les
     répétitions.
@@ -31,6 +32,8 @@ def score_rotation(
                 score_matrix[i, j] = 0.5
             else:
                 score_matrix[i, j] = 1
+    forbidden_pairs = forbidden_pairs or []
+    forbidden_dict = forbidden_pairs_to_dict(forbidden_pairs)
     rotations: List[List[List[str]]] = []
     for it in range(n_iterations):
         available = set(range(n_students))
@@ -52,6 +55,9 @@ def score_rotation(
                     # Prevent filling a table that would have more
                     # than one student difference with the smallest
                     if len(table) > min_len:
+                        continue
+                    # skip if adding this student would create a forbidden pair
+                    if forbidden_dict.get(students[student_idx], set()).intersection(table):
                         continue
                     if not table:
                         score = np.sum(score_matrix[student_idx, list(available)])
@@ -77,3 +83,13 @@ def score_rotation(
                         score_matrix[i, j] -= 1
         rotations.append(tables)
     return rotations
+
+
+def forbidden_pairs_to_dict(forbidden_pairs: Optional[List[Tuple[str, str]]]) -> dict:
+    """Convert a list of forbidden pairs (tuples) to a dict for fast lookup."""
+    forbidden_dict = {}
+    if forbidden_pairs:
+        for a, b in forbidden_pairs:
+            forbidden_dict.setdefault(a, set()).add(b)
+            forbidden_dict.setdefault(b, set()).add(a)
+    return forbidden_dict

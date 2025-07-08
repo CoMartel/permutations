@@ -36,13 +36,22 @@ def score_rotation(
         available = set(range(n_students))
         tables: List[List[str]] = [[] for _ in range(n_tables)]
         for seat in range(table_size):
-            # Pour chaque étudiant restant, on le place dans la table où il aurait le meilleur score
+            # For each remaining student, place them
+            # in the table where they would have the best score
             placed_this_seat = set()
             for student_idx in list(available):
                 best_table_idx = None
                 best_table_score = None
+                # Compute the current minimum table size
+                table_lengths = [len(table) for table in tables]
+                min_len = min(table_lengths)
                 for t, table in enumerate(tables):
+                    # Do not place if the table exceeds the balance constraint
                     if len(table) >= table_size:
+                        continue
+                    # Prevent filling a table that would have more
+                    # than one student difference with the smallest
+                    if len(table) > min_len:
                         continue
                     if not table:
                         score = np.sum(score_matrix[student_idx, list(available)])

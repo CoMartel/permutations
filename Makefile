@@ -13,7 +13,6 @@ venv:
 # Installation des dépendances
 install: venv
 	${VENV_BIN}/pip install -r requirements.txt
-	${VENV_BIN}/pip install -e .
 
 # Automated code formatting.
 fmt:

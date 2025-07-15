@@ -1,9 +1,9 @@
-name: Python Package using Conda
+name: Python Package
 
 on: [push]
 
 jobs:
-  build-linux:
+  build:
     runs-on: ubuntu-latest
     strategy:
       max-parallel: 5
@@ -14,19 +14,17 @@ jobs:
       uses: actions/setup-python@v3
       with:
         python-version: '3.11'
-    - name: Add conda to system path
-      run: |
-        # $CONDA is an environment variable pointing to the root of the miniconda directory
-        echo $CONDA/bin >> $GITHUB_PATH
     - name: Install dependencies
       run: |
-        conda env update --file environment.yml --name base
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install -e .
     - name: Lint
       run: |
-          pip install pre-commit==3.0.1
-          pre-commit install
-          make fmt
-    - name: Test with pytest
+        pip install pre-commit==3.0.1
+        pre-commit install
+        pre-commit run --all-files
+    - name: Test
       run: |
-        conda install pytest
-        pytest
+        pip install pytest pytest-cov
+        pytest tests/ --cov=permutations

@@ -26,4 +26,4 @@ jobs:
         pre-commit run --all-files
     - name: Test
       run: |
-        pytest tests/ --cov=permutations
+        pytest tests

@@ -6,7 +6,7 @@ Permutations is a Python project for generating table rotations with constraints
 
 ```
 Permutations/
-├── environment.yml                # Environment dependencies (conda)
+├── requirements.txt               # Environment dependencies
 ├── Makefile                       # Build and test commands
 ├── README.md                      # This file
 ├── ruff.toml                      # Ruff linter configuration
